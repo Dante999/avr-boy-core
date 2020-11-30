@@ -11,9 +11,10 @@ endif()
 
 # ------------------------------------------------------------------------------
 # add standard compiler warnings
-add_library(
-	project_warnings INTERFACE)
-include(cmake/compiler-warnings.cmake)
-set_project_warnings(project_warnings)
+if(NOT TARGET project_warnings)
+	add_library(project_warnings INTERFACE)
+	include(cmake/compiler-warnings.cmake)
+	set_project_warnings(project_warnings)
+endif()
 
 add_subdirectory(src)

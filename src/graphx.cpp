@@ -1,4 +1,4 @@
-#include "avr_boy_core/graphx.hpp"
+#include "avr-boy-core/graphx.hpp"
 
 #include <string.h> // strlen()
 

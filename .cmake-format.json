@@ -91,7 +91,7 @@
       "If a statement is wrapped to more than one line, than dangle",
       "the closing parenthesis on its own line."
     ],
-    "dangle_parens": false,
+    "dangle_parens": true,
     "_help_dangle_align": [
       "If the trailing parenthesis must be 'dangled' on its on",
       "line, then align it to this reference: `prefix`: the start",
@@ -134,7 +134,8 @@
     ],
     "always_wrap": [
       "target_link_libraries",
-      "add_library"
+      "add_library",
+      "add_executable"
     ],
     "_help_enable_sort": [
       "If true, the argument lists which are known to be sortable",

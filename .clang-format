@@ -2,6 +2,7 @@
 # Settings based on Linux Kernel recommendations
 BasedOnStyle: LLVM
 IndentWidth: 8
+AccessModifierOffset: -8
 UseTab: ForIndentation
 
 #BreakBeforeBraces: Linux
@@ -44,7 +45,7 @@ IndentPPDirectives: AfterHash
 
 
 
-AccessModifierOffset: -4
+
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortFunctionsOnASingleLine: Empty
 BreakConstructorInitializers: BeforeColon

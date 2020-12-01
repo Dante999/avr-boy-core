@@ -9,7 +9,7 @@
 class graphx_c {
 
     public:
-	enum color_e { PIXEL_ON, PIXEL_OFF, PIXEL_TOGGLE };
+	enum color_e { PIXEL_OFF, PIXEL_ON, PIXEL_TOGGLE };
 
 	static constexpr uint8_t  width  = 128;
 	static constexpr uint8_t  height = 64;

@@ -17,4 +17,10 @@ if(NOT TARGET project_warnings)
 	set_project_warnings(project_warnings)
 endif()
 
+# ------------------------------------------------------------------------------
+# add standard compiler warnings
+include(cmake/conan.cmake)
+run_conan()
+
 add_subdirectory(src)
+add_subdirectory(test)

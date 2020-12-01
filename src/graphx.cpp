@@ -118,3 +118,13 @@ void graphx_c::draw_tile(uint8_t x, uint8_t y, const uint8_t *tile, uint8_t w,
 		}
 	}
 }
+
+void graphx_c::fill(uint8_t color)
+{
+	if (color == PIXEL_ON) {
+		m_buffer.fill(0xFF);
+	}
+	else {
+		m_buffer.fill(0x00);
+	}
+}

@@ -8,7 +8,7 @@
 
 class graphx_c {
 
-    public:
+public:
 	enum color_e { PIXEL_OFF, PIXEL_ON, PIXEL_TOGGLE };
 
 	static constexpr uint8_t  width  = 128;
@@ -20,17 +20,18 @@ class graphx_c {
 	static constexpr uint8_t max_x = width - 1;
 	static constexpr uint8_t max_y = height - 1;
 
-    private:
+private:
 	std::array<uint8_t, length> m_buffer{0x00};
 
-    private:
+private:
 	uint16_t get_index(uint8_t x, uint8_t y);
 
 	void draw_byte(uint8_t x, uint8_t y, uint8_t byte);
 
-    public:
+public:
 	uint8_t get_pixel(uint8_t x, uint8_t y);
 
+	void fill(uint8_t color);
 	void draw_char(const uint8_t font[], uint8_t x, uint8_t y,
 	               const char c);
 	void draw_string(const uint8_t font[], uint8_t x, uint8_t y,

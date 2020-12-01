@@ -14,7 +14,7 @@ uint8_t graphx_c::get_pixel(uint8_t x, uint8_t y)
 	const uint8_t  y_bit = y % 8;
 	const uint16_t index = get_index(x, y);
 
-	return m_buffer.at(index) & (1 << y_bit);
+	return (m_buffer.at(index) & (1 << y_bit)) ? PIXEL_ON : PIXEL_OFF;
 }
 
 void graphx_c::draw_pixel(uint8_t x, uint8_t y, uint8_t color)

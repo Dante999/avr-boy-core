@@ -18,9 +18,14 @@ if(NOT TARGET project_warnings)
 endif()
 
 # ------------------------------------------------------------------------------
-# add standard compiler warnings
-include(cmake/conan.cmake)
-run_conan()
+# setup conan
+set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES} gtest/1.10.0)
+
+if(NOT CONAN_INITIALIZED)
+	set(CONAN_INITIALIZED TRUE)
+	include(cmake/conan.cmake)
+	run_conan()
+endif()
 
 add_subdirectory(src)
 add_subdirectory(test)

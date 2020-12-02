@@ -17,7 +17,6 @@ macro(run_conan)
 	conan_cmake_run(
 		REQUIRES
 		${CONAN_EXTRA_REQUIRES}
-		gtest/1.10.0
 		OPTIONS
 		${CONAN_EXTRA_OPTIONS}
 		BASIC_SETUP

@@ -7,6 +7,11 @@ protected:
 	graphx_c m_graphx;
 
 public:
+	static constexpr uint16_t tile_size(uint8_t width, uint8_t height)
+	{
+		return static_cast<uint16_t>(width * height / 8);
+	}
+
 	void check_pixel(uint8_t x, uint8_t y, uint8_t color)
 	{
 		ASSERT_EQ(color, m_graphx.get_pixel(x, y))
@@ -46,9 +51,24 @@ public:
 			}
 		}
 	}
+
+	template <typename T, size_t S>
+	void check_get_tile(uint8_t x, uint8_t y, const std::array<T, S> &tile,
+	                    uint8_t w, uint8_t h)
+	{
+
+		std::array<T, S> tmp_tile;
+
+		// Tile tmp_tile;
+		m_graphx.get_tile(x, y, tmp_tile.data(), w, h);
+
+		for (uint8_t i = 0; i < tile.size(); ++i) {
+			ASSERT_EQ(tile[i], tmp_tile[i]);
+		}
+	}
 };
 
-TEST_F(graphx_test, set_pixel_and_get_pixel)
+TEST_F(graphx_test, set_pixel)
 {
 
 	for (uint8_t x = 0; x < m_graphx.width; ++x) {
@@ -131,12 +151,14 @@ TEST_F(graphx_test, draw_tile_4x16)
 	const uint8_t width  = 4;
 	const uint8_t height = 16;
 
-	// rectangle
-	const uint8_t tile[] = {0xFF, 0x01, 0x01, 0xFF, 0xFF, 0x80, 0x80, 0xFF};
+	// tile with the shape of a rectangle
+	std::array<uint8_t, width *height / 8> tile = {0xFF, 0x01, 0x01, 0xFF,
+	                                               0xFF, 0x80, 0x80, 0xFF};
 
-	m_graphx.draw_tile(0, 0, tile, width, height);
+	m_graphx.draw_tile(0, 0, tile.data(), width, height);
 
 	check_rect(0, width - 1, 0, height - 1, graphx_c::PIXEL_ON);
+	check_get_tile(0, 0, tile, width, height);
 }
 
 TEST_F(graphx_test, draw_tile_1x64)
@@ -144,12 +166,14 @@ TEST_F(graphx_test, draw_tile_1x64)
 	const uint8_t width  = 1;
 	const uint8_t height = 64;
 
-	// vertical line
-	const uint8_t tile[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	// tile with the shape of a vertical line
+	std::array<uint8_t, tile_size(width, height)> tile = {
+	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-	m_graphx.draw_tile(0, 0, tile, width, height);
+	m_graphx.draw_tile(0, 0, tile.data(), width, height);
 
 	check_rect(0, width - 1, 0, height - 1, graphx_c::PIXEL_ON);
+	check_get_tile(0, 0, tile, width, height);
 }
 
 TEST_F(graphx_test, draw_tile_128x8)
@@ -157,8 +181,8 @@ TEST_F(graphx_test, draw_tile_128x8)
 	const uint8_t width  = 128;
 	const uint8_t height = 8;
 
-	// horizontal line
-	const uint8_t tile[] = {
+	// tile with the shape of a horizontal line
+	std::array<uint8_t, tile_size(width, height)> tile = {
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
@@ -172,9 +196,10 @@ TEST_F(graphx_test, draw_tile_128x8)
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
 
-	m_graphx.draw_tile(0, 0, tile, width, height);
+	m_graphx.draw_tile(0, 0, tile.data(), width, height);
 
 	check_rect(0, width - 1, 0, 0, graphx_c::PIXEL_ON);
+	check_get_tile(0, 0, tile, width, height);
 }
 
 TEST_F(graphx_test, draw_tile_128x64)
@@ -183,7 +208,7 @@ TEST_F(graphx_test, draw_tile_128x64)
 	const uint8_t height = 64;
 
 	// this tile is basically just a 128x64 rect
-	const uint8_t tile[] = {
+	std::array<uint8_t, tile_size(width, height)> tile = {
 	    0xff, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 	    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
@@ -277,14 +302,15 @@ TEST_F(graphx_test, draw_tile_128x64)
 	    0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
 	    0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
 	    0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-	    0xff,
-	};
+	    0xff};
 
-	m_graphx.draw_tile(0, 0, tile, width, height);
+	m_graphx.draw_tile(0, 0, tile.data(), width, height);
 
 	check_hline(0, width - 1, 0, graphx_c::PIXEL_ON);
 	check_hline(0, width - 1, height - 1, graphx_c::PIXEL_ON);
 
 	check_vline(0, 0, height - 1, graphx_c::PIXEL_ON);
 	check_vline(width - 1, 0, height - 1, graphx_c::PIXEL_ON);
+
+	check_get_tile(0, 0, tile, width, height);
 }

@@ -40,6 +40,20 @@ void graphx_c::draw_byte(uint8_t x, uint8_t y, uint8_t byte)
 	}
 }
 
+uint8_t graphx_c::get_byte(uint8_t x, uint8_t y)
+{
+	uint8_t byte = 0x00;
+
+	for (uint8_t j = 0; j < 8; j++) {
+
+		if (get_pixel(x, y + j) == PIXEL_ON) {
+			byte |= (1 << j);
+		}
+	}
+
+	return byte;
+}
+
 void graphx_c::draw_char(const uint8_t font[], uint8_t x, uint8_t y,
                          const char c)
 {
@@ -115,6 +129,23 @@ void graphx_c::draw_tile(uint8_t x, uint8_t y, const uint8_t *tile, uint8_t w,
 			const uint8_t  y_new  = y + (row * 8);
 
 			draw_byte(x_new, y_new, data);
+		}
+	}
+}
+
+void graphx_c::get_tile(uint8_t x, uint8_t y, uint8_t *tile, uint8_t w,
+                        uint8_t h)
+{
+
+	for (uint8_t row = 0; row < (h / 8); row++) {
+
+		for (uint8_t col = 0; col < w; col++) {
+
+			const uint16_t offset = row * w;
+			const uint8_t  x_new  = x + col;
+			const uint8_t  y_new  = y + (row * 8);
+
+			tile[offset + col] = get_byte(x_new, y_new);
 		}
 	}
 }

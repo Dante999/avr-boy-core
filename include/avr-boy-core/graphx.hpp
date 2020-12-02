@@ -26,10 +26,14 @@ private:
 private:
 	uint16_t get_index(uint8_t x, uint8_t y);
 
-	void draw_byte(uint8_t x, uint8_t y, uint8_t byte);
+	void    draw_byte(uint8_t x, uint8_t y, uint8_t byte);
+	uint8_t get_byte(uint8_t x, uint8_t y);
 
 public:
 	uint8_t get_pixel(uint8_t x, uint8_t y);
+
+	void get_tile(uint8_t x, uint8_t y, uint8_t *tile, uint8_t w,
+	              uint8_t h);
 
 	void fill(uint8_t color);
 	void draw_char(const uint8_t font[], uint8_t x, uint8_t y,

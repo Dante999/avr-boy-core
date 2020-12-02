@@ -62,7 +62,7 @@ public:
 		// Tile tmp_tile;
 		m_graphx.get_tile(x, y, tmp_tile.data(), w, h);
 
-		for (uint8_t i = 0; i < tile.size(); ++i) {
+		for (size_t i = 0; i < tile.size(); ++i) {
 			ASSERT_EQ(tile[i], tmp_tile[i]);
 		}
 	}

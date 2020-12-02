@@ -4,6 +4,10 @@ project("avr_boy_core")
 
 # ------------------------------------------------------------------------------
 # check if project options are already defined
+include(cmake/standard-project-settings.cmake)
+
+# ------------------------------------------------------------------------------
+# check if project options are already defined
 if(NOT TARGET project_options)
 	add_library(project_options INTERFACE)
 	target_compile_features(project_options INTERFACE cxx_std_17)

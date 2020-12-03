@@ -4,48 +4,30 @@ BasedOnStyle: LLVM
 IndentWidth: 8
 AccessModifierOffset: -8
 UseTab: ForIndentation
-
-#BreakBeforeBraces: Linux
-
-AllowShortIfStatementsOnASingleLine: false
+# ------------------------------------------------------------------------------
 IndentCaseLabels: false
-
-################################################
-# Custom Settings
-################################################
+IndentPPDirectives: AfterHash
+# ------------------------------------------------------------------------------
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true 
+AlignConsecutiveMacros: true
+# ------------------------------------------------------------------------------
+AllowShortIfStatementsOnASingleLine: false
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: Empty
+# ------------------------------------------------------------------------------
+BreakConstructorInitializers: BeforeColon
 BreakBeforeBraces: Custom
-
 BraceWrapping:
    AfterFunction: true
    BeforeElse: true
 
-# int aaaa = 12;
-# int b    = 23;
-# int ccc  = 23;
-AlignConsecutiveAssignments: true
-
-# int         aaaa = 12;
-# float       b = 23;
-# std::string ccc = 23;
-AlignConsecutiveDeclarations: true 
-
-# #define SHORT_NAME       42
-# #define LONGER_NAME      0x007f
-# #define EVEN_LONGER_NAME (2)
-# #define foo(x)           (x * x)
-# #define bar(y, z)        (y + z)
-AlignConsecutiveMacros: true
-
-# #if FOO
-#  #if BAR
-#    #include <foo>
-#  #endif
-# #endif
-IndentPPDirectives: AfterHash
 
 
 
 
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortFunctionsOnASingleLine: Empty
-BreakConstructorInitializers: BeforeColon
+
+
+
+
+

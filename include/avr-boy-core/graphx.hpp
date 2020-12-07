@@ -1,7 +1,6 @@
 #ifndef GRAPHX_HPP
 #define GRAPHX_HPP
 
-#include <array>
 #include <stdint.h>
 
 #include "font.hpp"
@@ -21,7 +20,7 @@ public:
 	static constexpr uint8_t max_y = height - 1;
 
 private:
-	std::array<uint8_t, length> m_buffer{0x00};
+	uint8_t m_buffer[length] = {0x00};
 
 private:
 	uint16_t get_index(uint8_t x, uint8_t y);

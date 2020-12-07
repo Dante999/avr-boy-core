@@ -14,7 +14,7 @@ uint8_t graphx_c::get_pixel(uint8_t x, uint8_t y)
 	const uint8_t  y_bit = y % 8;
 	const uint16_t index = get_index(x, y);
 
-	return (m_buffer.at(index) & (1 << y_bit)) ? PIXEL_ON : PIXEL_OFF;
+	return (m_buffer[index] & (1 << y_bit)) ? PIXEL_ON : PIXEL_OFF;
 }
 
 void graphx_c::draw_pixel(uint8_t x, uint8_t y, uint8_t color)
@@ -23,11 +23,11 @@ void graphx_c::draw_pixel(uint8_t x, uint8_t y, uint8_t color)
 	const uint16_t index = get_index(x, y);
 
 	if (color == PIXEL_ON)
-		m_buffer.at(index) |= (1u << y_bit);
+		m_buffer[index] |= (1u << y_bit);
 	else if (color == PIXEL_TOGGLE)
-		m_buffer.at(index) ^= (1 << y_bit);
+		m_buffer[index] ^= (1 << y_bit);
 	else
-		m_buffer.at(index) &= ~(1 << y_bit);
+		m_buffer[index] &= ~(1 << y_bit);
 }
 
 void graphx_c::draw_byte(uint8_t x, uint8_t y, uint8_t byte)
@@ -153,9 +153,9 @@ void graphx_c::get_tile(uint8_t x, uint8_t y, uint8_t *tile, uint8_t w,
 void graphx_c::fill(uint8_t color)
 {
 	if (color == PIXEL_ON) {
-		m_buffer.fill(0xFF);
+		memset(m_buffer, 0xFF, length);
 	}
 	else {
-		m_buffer.fill(0x00);
+		memset(m_buffer, 0x00, length);
 	}
 }

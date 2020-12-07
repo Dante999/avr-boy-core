@@ -2,7 +2,8 @@
 
 add_library(
 	${PROJECT_NAME}
-	graphx.cpp
+	graphx.cpp #
+	protocol.cpp
 )
 
 target_link_libraries(

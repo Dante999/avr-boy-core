@@ -43,24 +43,43 @@ enum commands {
 	PRTCL_CMD_SPRITE,
 };
 
-typedef void (*protocol_callback_transmit)(uint8_t byte);
-typedef uint8_t (*protocol_callback_receive)(void);
+class protocol_c {
 
-struct protocol_package {
-	uint8_t cmd;
-	uint8_t length;
-	uint8_t data[PROTOCOL_MAX_LENGTH];
+public:
+	typedef void (*transmit_cb)(uint8_t byte);
+	typedef uint8_t (*receive_cb)(void);
+
+	struct package_s {
+		uint8_t cmd;
+		uint8_t length;
+		uint8_t data[PROTOCOL_MAX_LENGTH];
+	};
+
+private:
+	enum state_e {
+		WAITFOR_SYNC,
+		WAITFOR_CMD,
+		WAITFOR_LENGTH,
+		WAITFOR_DATA
+	};
+
+	state_e     m_state{WAITFOR_SYNC};
+	transmit_cb m_cb_transmit;
+	receive_cb  m_cb_receive;
+	bool        m_receive_complete{false};
+	package_s   m_package;
+
+private:
+	bool parse_received_byte(uint8_t byte);
+	void copy_received_to(package_s &result);
+
+public:
+	protocol_c(transmit_cb cb_transmit, receive_cb cb_receive);
+
+	void sync();
+	void reset();
+	void send_package(uint8_t cmd, uint8_t length, const uint8_t *data);
+	void waitfor_package(package_s &result);
 };
-
-void protocol_init(protocol_callback_transmit cb_transmit,
-                   protocol_callback_receive  cb_receive);
-
-void protocol_sync(void);
-void protocol_send_package(uint8_t cmd, uint8_t length, const uint8_t *data);
-void protocol_waitfor_package(struct protocol_package *package);
-bool protocol_parse_received(uint8_t c);
-bool protocol_receive_complete(void);
-void protocol_copy_received(struct protocol_package *package);
-void protocol_reset(void);
 
 #endif /* AVRBOY_PROTOCOL_H */

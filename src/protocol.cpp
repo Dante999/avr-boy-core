@@ -20,23 +20,14 @@
 
 #include <stdio.h>
 
-#define PROTOCOL_LOG 0
+protocol_c::protocol_c(transmit_cb cb_transmit,
+                       receive_cb  cb_receive)
+    : m_cb_transmit(cb_transmit), //
+      m_cb_receive(cb_receive)
+{
+}
 
-#if PROTOCOL_LOG
-#	include "util/logger.h"
-#endif
-
-enum state { WAITFOR_SYNC, WAITFOR_CMD, WAITFOR_LENGTH, WAITFOR_DATA };
-
-static enum state              m_state = WAITFOR_SYNC;
-static struct protocol_package m_package;
-
-static volatile bool m_finished = false;
-
-static protocol_callback_transmit m_callback_transmit = NULL;
-static protocol_callback_receive  m_callback_receive  = NULL;
-
-static void parse_byte(uint8_t byte)
+bool protocol_c::parse_received_byte(uint8_t byte)
 {
 	static uint8_t i = 0;
 
@@ -44,9 +35,9 @@ static void parse_byte(uint8_t byte)
 	case WAITFOR_SYNC:
 
 		if (byte == PRTCL_START_BYTE) {
-			i          = 0;
-			m_state    = WAITFOR_CMD;
-			m_finished = false;
+			i                  = 0;
+			m_state            = WAITFOR_CMD;
+			m_receive_complete = false;
 		}
 
 		break;
@@ -68,9 +59,9 @@ static void parse_byte(uint8_t byte)
 			m_package.length = PROTOCOL_MAX_LENGTH;
 
 		if (m_package.length == 0) {
-			i          = 0;
-			m_state    = WAITFOR_SYNC;
-			m_finished = true;
+			i                  = 0;
+			m_state            = WAITFOR_SYNC;
+			m_receive_complete = true;
 		}
 		else {
 			m_state = WAITFOR_DATA;
@@ -86,131 +77,61 @@ static void parse_byte(uint8_t byte)
 		}
 
 		if (i >= m_package.length || i >= PROTOCOL_MAX_LENGTH) {
-			m_state    = WAITFOR_SYNC;
-			i          = 0;
-			m_finished = true;
+			m_state            = WAITFOR_SYNC;
+			i                  = 0;
+			m_receive_complete = true;
 		}
 
 		break;
 	}
+
+	return m_receive_complete;
 }
 
-/** ****************************************************************************
- * @brief returns if the receive of a data package is complete or not
- *
- * @return true  the data package is complete
- * @return false the data package is not yet complete
- **************************************************************************** */
-bool protocol_receive_complete(void)
-{
-	return m_finished;
-}
-
-/** ****************************************************************************
- * @brief parses the given byte to the protocol
- *
- * @param c the received byte
- *
- * @return true  if the data package is complete
- * @return false if the data package is not yet complete
- **************************************************************************** */
-bool protocol_parse_received(uint8_t c)
-{
-	parse_byte(c);
-	return m_finished;
-}
-
-/** ****************************************************************************
- * @brief sends the given parameters to a receiver
- *
- * The method uses the callback which was given through the protocol_init(..)
- * for sending data to the receiver
- *
- * @param cmd    the command byte for the receiver
- * @param length the length of the following data
- * @param data   the data or payload itself
- **************************************************************************** */
-void protocol_send_package(uint8_t cmd, uint8_t length, const uint8_t *data)
-{
-	m_callback_transmit(PRTCL_START_BYTE);
-	m_callback_transmit(cmd);
-	m_callback_transmit(length);
-
-#if PROTOCOL_LOG
-	char msg[35];
-	snprintf(msg, 35, "send     : [c=%d|l=%d]", cmd, length);
-	LOG_DEBUG(msg);
-#endif
-
-	for (uint8_t i = 0; i < length; i++) {
-		m_callback_transmit(data[i]);
-	}
-}
-
-void protocol_waitfor_package(struct protocol_package *package)
+void protocol_c::waitfor_package(package_s &result)
 {
 
-	while (!m_finished) {
-		uint8_t c = m_callback_receive();
-		protocol_parse_received(c);
+	while (!m_receive_complete) {
+		const uint8_t c = m_cb_receive();
+		parse_received_byte(c);
 	}
 
-#if PROTOCOL_LOG
-	char msg[35];
-	snprintf(msg, 35, "received : [c=%d|l=%d]", m_package.cmd,
-	         m_package.length);
-	LOG_DEBUG(msg);
-#endif
-
-	protocol_copy_received(package);
-	protocol_reset();
+	copy_received_to(result);
+	reset();
 }
 
-void protocol_sync(void)
+void protocol_c::sync(void)
 {
 	for (uint8_t i = 0; i <= PROTOCOL_MAX_LENGTH; i++) {
-		m_callback_transmit(PRTCL_START_BYTE);
+		m_cb_transmit(PRTCL_START_BYTE);
 	}
 
-	protocol_reset();
+	reset();
 }
 
-/** ****************************************************************************
- * @brief initialises the module and sets the transmit callback
- *
- * @param callback the callback method for transmitting data
- **************************************************************************** */
-void protocol_init(protocol_callback_transmit cb_transmit,
-                   protocol_callback_receive  cb_receive)
+void protocol_c::reset(void)
 {
-	m_callback_transmit = cb_transmit;
-	m_callback_receive  = cb_receive;
+	m_state            = WAITFOR_SYNC;
+	m_receive_complete = false;
 }
 
-/** ****************************************************************************
- * @brief resets the module to the initial state
- *
- * After that the protocol waits for receiving the SYNC byte again
- *
- **************************************************************************** */
-void protocol_reset(void)
+void protocol_c::copy_received_to(package_s &result)
 {
-	m_state    = WAITFOR_SYNC;
-	m_finished = false;
-}
-
-/** ****************************************************************************
- * @brief copies the internal received data to the given structure pointer
- *
- * @param dest_package the destination package into which the data should be
- *                     copied
- **************************************************************************** */
-void protocol_copy_received(struct protocol_package *dest_package)
-{
-	dest_package->cmd    = m_package.cmd;
-	dest_package->length = m_package.length;
+	result.cmd    = m_package.cmd;
+	result.length = m_package.length;
 
 	for (uint8_t i = 0; i < m_package.length; i++) {
-		dest_package->data[i] = m_package.data[i];
+		result.data[i] = m_package.data[i];
+	}
+}
+
+void protocol_c::send_package(uint8_t cmd, uint8_t length, const uint8_t *data)
+{
+	m_cb_transmit(PRTCL_START_BYTE);
+	m_cb_transmit(cmd);
+	m_cb_transmit(length);
+
+	for (uint8_t i = 0; i < length; ++i) {
+		m_cb_transmit(data[i]);
 	}
 }

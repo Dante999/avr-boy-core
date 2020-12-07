@@ -1,6 +1,7 @@
 add_executable(
 	unit-tests
-	graphx_test.cpp
+	graphx_test.cpp #
+	protocol_test.cpp
 )
 
 target_link_libraries(

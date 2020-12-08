@@ -2,6 +2,8 @@
 
 #include "avr-boy-core/protocol.hpp"
 
+static constexpr uint8_t DUMMY_CMD  = 0x10;
+static constexpr uint8_t START_BYTE = protocol_c::START_BYTE;
 static constexpr uint8_t BUFFER_LEN = 255;
 
 static uint8_t m_receive_buffer[BUFFER_LEN];
@@ -56,8 +58,8 @@ TEST_F(protocol_test, receive_callback)
 	protocol_c m_protocol(&this->transmit, &this->receive);
 	init();
 
-	m_receive_buffer[0] = PRTCL_START_BYTE;
-	m_receive_buffer[1] = PRTCL_CMD_CHECK_VERSION;
+	m_receive_buffer[0] = START_BYTE;
+	m_receive_buffer[1] = DUMMY_CMD;
 	m_receive_buffer[2] = 1;
 	m_receive_buffer[3] = 2;
 
@@ -70,7 +72,7 @@ TEST_F(protocol_test, receive_callback)
 
 	ASSERT_EQ(4, m_receive_index);
 
-	ASSERT_EQ(PRTCL_CMD_CHECK_VERSION, received.cmd);
+	ASSERT_EQ(DUMMY_CMD, received.cmd);
 	ASSERT_EQ(1, received.length);
 	ASSERT_EQ(2, received.data[0]);
 }
@@ -86,7 +88,7 @@ TEST_F(protocol_test, transmit_callback)
 
 	ASSERT_EQ(5, m_transmit_index);
 
-	ASSERT_EQ(PRTCL_START_BYTE, m_transmit_buffer[0]);
+	ASSERT_EQ(START_BYTE, m_transmit_buffer[0]);
 
 	ASSERT_EQ(data[0], m_transmit_buffer[1]);
 	ASSERT_EQ(data[1], m_transmit_buffer[2]);
@@ -99,8 +101,8 @@ TEST_F(protocol_test, receive_package_with_min_length)
 	protocol_c m_protocol(&this->transmit, &this->receive);
 	init();
 
-	uint8_t sync   = PRTCL_START_BYTE;
-	uint8_t cmd    = PRTCL_CMD_PING;
+	uint8_t sync   = START_BYTE;
+	uint8_t cmd    = DUMMY_CMD;
 	uint8_t length = 0;
 
 	m_receive_buffer[0] = sync;
@@ -118,15 +120,15 @@ TEST_F(protocol_test, receive_package_with_min_length)
 
 TEST_F(protocol_test, receive_package_with_max_length)
 {
-	ASSERT_TRUE(PROTOCOL_MAX_LENGTH < 255)
+	ASSERT_TRUE(protocol_c::MAX_DATA_LEN < 255)
 	    << "Protocol length already exceed 8bit limit! Cannot test";
 
 	protocol_c m_protocol(&this->transmit, &this->receive);
 	init();
 
-	uint8_t sync   = PRTCL_START_BYTE;
-	uint8_t cmd    = PRTCL_CMD_PING;
-	uint8_t length = PROTOCOL_MAX_LENGTH + 1;
+	uint8_t sync   = START_BYTE;
+	uint8_t cmd    = DUMMY_CMD;
+	uint8_t length = protocol_c::MAX_DATA_LEN + 1;
 
 	m_receive_buffer[0] = sync;
 	m_receive_buffer[1] = cmd;
@@ -138,7 +140,7 @@ TEST_F(protocol_test, receive_package_with_max_length)
 
 	m_protocol.waitfor_package(received);
 
-	ASSERT_EQ(PROTOCOL_MAX_LENGTH, received.length);
+	ASSERT_EQ(protocol_c::MAX_DATA_LEN, received.length);
 }
 
 TEST_F(protocol_test, reset_when_multible_start_bytes)
@@ -149,12 +151,12 @@ TEST_F(protocol_test, reset_when_multible_start_bytes)
 	m_receive_buffer[0] = 3;
 	m_receive_buffer[1] = 3;
 	m_receive_buffer[2] = 3;
-	m_receive_buffer[3] = PRTCL_START_BYTE;
-	m_receive_buffer[4] = PRTCL_START_BYTE;
-	m_receive_buffer[5] = PRTCL_START_BYTE;
-	m_receive_buffer[6] = PRTCL_START_BYTE;
-	m_receive_buffer[7] = PRTCL_START_BYTE;
-	m_receive_buffer[8] = PRTCL_CMD_PING;
+	m_receive_buffer[3] = START_BYTE;
+	m_receive_buffer[4] = START_BYTE;
+	m_receive_buffer[5] = START_BYTE;
+	m_receive_buffer[6] = START_BYTE;
+	m_receive_buffer[7] = START_BYTE;
+	m_receive_buffer[8] = DUMMY_CMD;
 	m_receive_buffer[9] = 0;
 
 	// check received data
@@ -163,7 +165,7 @@ TEST_F(protocol_test, reset_when_multible_start_bytes)
 
 	m_protocol.waitfor_package(received);
 
-	ASSERT_EQ(PRTCL_CMD_PING, received.cmd);
+	ASSERT_EQ(DUMMY_CMD, received.cmd);
 	ASSERT_EQ(0, received.length);
 }
 
@@ -176,9 +178,9 @@ TEST_F(protocol_test, sync)
 
 	m_protocol.sync();
 
-	for (uint8_t i = 0; i <= PROTOCOL_MAX_LENGTH; i++) {
-		ASSERT_EQ(PRTCL_START_BYTE, m_transmit_buffer[i]);
+	for (uint8_t i = 0; i <= protocol_c::MAX_DATA_LEN; i++) {
+		ASSERT_EQ(START_BYTE, m_transmit_buffer[i]);
 	}
 
-	ASSERT_EQ(0xFF, m_transmit_buffer[PROTOCOL_MAX_LENGTH + 1]);
+	ASSERT_EQ(0xFF, m_transmit_buffer[protocol_c::MAX_DATA_LEN + 1]);
 }

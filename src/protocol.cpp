@@ -34,7 +34,7 @@ bool protocol_c::parse_received_byte(uint8_t byte)
 	switch (m_state) {
 	case WAITFOR_SYNC:
 
-		if (byte == PRTCL_START_BYTE) {
+		if (byte == START_BYTE) {
 			i                  = 0;
 			m_state            = WAITFOR_CMD;
 			m_receive_complete = false;
@@ -44,7 +44,7 @@ bool protocol_c::parse_received_byte(uint8_t byte)
 
 	case WAITFOR_CMD:
 
-		if (byte != PRTCL_START_BYTE) {
+		if (byte != START_BYTE) {
 			m_package.cmd = byte;
 			m_state       = WAITFOR_LENGTH;
 		}
@@ -55,8 +55,8 @@ bool protocol_c::parse_received_byte(uint8_t byte)
 
 		m_package.length = byte;
 
-		if (m_package.length > PROTOCOL_MAX_LENGTH)
-			m_package.length = PROTOCOL_MAX_LENGTH;
+		if (m_package.length > MAX_DATA_LEN)
+			m_package.length = MAX_DATA_LEN;
 
 		if (m_package.length == 0) {
 			i                  = 0;
@@ -76,7 +76,7 @@ bool protocol_c::parse_received_byte(uint8_t byte)
 			i++;
 		}
 
-		if (i >= m_package.length || i >= PROTOCOL_MAX_LENGTH) {
+		if (i >= m_package.length || i >= MAX_DATA_LEN) {
 			m_state            = WAITFOR_SYNC;
 			i                  = 0;
 			m_receive_complete = true;
@@ -102,8 +102,8 @@ void protocol_c::waitfor_package(package_s &result)
 
 void protocol_c::sync(void)
 {
-	for (uint8_t i = 0; i <= PROTOCOL_MAX_LENGTH; i++) {
-		m_cb_transmit(PRTCL_START_BYTE);
+	for (uint8_t i = 0; i <= MAX_DATA_LEN; i++) {
+		m_cb_transmit(START_BYTE);
 	}
 
 	reset();
@@ -127,7 +127,7 @@ void protocol_c::copy_received_to(package_s &result)
 
 void protocol_c::send_package(uint8_t cmd, uint8_t length, const uint8_t *data)
 {
-	m_cb_transmit(PRTCL_START_BYTE);
+	m_cb_transmit(START_BYTE);
 	m_cb_transmit(cmd);
 	m_cb_transmit(length);
 

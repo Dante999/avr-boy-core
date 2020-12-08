@@ -23,36 +23,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define PROTOCOL_MAX_LENGTH 50
-#define PROTOCOL_VERSION    1
-
-enum commands {
-	PRTCL_START_BYTE,
-	PRTCL_CMD_SYNC,
-	PRTCL_CMD_ACK,
-	PRTCL_CMD_NACK,
-	PRTCL_CMD_PING,
-	PRTCL_CMD_PONG,
-	PRTCL_CMD_CHECK_VERSION,
-	PRTCL_CMD_GET_BUTTONS,
-	PRTCL_CMD_DISPLAY_BUFFER,
-	PRTCL_CMD_DISPLAY_SPRITES,
-	PRTCL_CMD_DRAW_TEXT,
-	PRTCL_CMD_DRAW_PIXEL,
-	PRTCL_CMD_CLEAR_SCREEN,
-	PRTCL_CMD_SPRITE,
-};
-
 class protocol_c {
 
 public:
+	static constexpr uint8_t START_BYTE   = 0x00;
+	static constexpr uint8_t MAX_DATA_LEN = 50;
+
 	typedef void (*transmit_cb)(uint8_t byte);
 	typedef uint8_t (*receive_cb)(void);
 
 	struct package_s {
 		uint8_t cmd;
 		uint8_t length;
-		uint8_t data[PROTOCOL_MAX_LENGTH];
+		uint8_t data[MAX_DATA_LEN];
 	};
 
 private:

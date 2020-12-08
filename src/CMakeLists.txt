@@ -3,7 +3,9 @@
 add_library(
 	${PROJECT_NAME}
 	graphx.cpp #
-	protocol.cpp
+	protocol.cpp #
+	cartridge.cpp #
+	handheld.cpp
 )
 
 target_link_libraries(

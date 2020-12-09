@@ -6,28 +6,39 @@
 
 class handheld_c {
 
+public:
+	typedef void (*before_transmit_cb)(void);
+	typedef void (*after_transmit_cb)(void);
+
 private:
 	protocol_c            m_protocol;
 	protocol_c::package_s m_received;
 
+	before_transmit_cb m_cb_before_transmit = nullptr;
+	after_transmit_cb  m_cb_after_transmit  = nullptr;
+
 private:
-	inline void transmit(uint8_t cmd, uint8_t length, const uint8_t *data)
-	{
-		m_protocol.send_package(cmd, length, data);
-	}
-
-	inline void waitfor_receive()
-	{
-		m_protocol.waitfor_package(m_received);
-	}
-
+	void transmit(uint8_t cmd, uint8_t length, const uint8_t *data);
+	void waitfor_receive();
 	void handle_ping();
 
 public:
 	handheld_c(protocol_c::transmit_cb cb_transmit,
 	           protocol_c::receive_cb  cb_receive);
 
+	void set_before_transmit_callback(before_transmit_cb cb);
+	void set_after_transmit_callback(after_transmit_cb cb);
 	void waitfor_instructions();
 };
+
+inline void handheld_c::set_before_transmit_callback(before_transmit_cb cb)
+{
+	m_cb_before_transmit = cb;
+}
+
+inline void handheld_c::set_after_transmit_callback(after_transmit_cb cb)
+{
+	m_cb_after_transmit = cb;
+}
 
 #endif /* HANDHELD_H */

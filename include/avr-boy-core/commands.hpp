@@ -24,7 +24,7 @@ enum commands_e {
 
 enum color_dao_e : uint8_t { COLOR_WHITE, COLOR_BLACK };
 
-struct payload_pixel_s {
+struct payload_draw_pixel_s {
 	uint8_t x;
 	uint8_t y;
 	uint8_t color;

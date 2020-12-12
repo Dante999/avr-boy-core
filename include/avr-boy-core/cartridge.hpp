@@ -29,6 +29,7 @@ public:
 	void set_after_transmit_callback(after_transmit_cb cb);
 
 	result_e ping();
+	result_e draw_pixel(uint8_t x, uint8_t y, color_dao_e color);
 };
 
 inline void cartridge_c::set_before_transmit_callback(before_transmit_cb cb)

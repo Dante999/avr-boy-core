@@ -2,6 +2,7 @@
 #define HANDHELD_H
 
 #include "avr-boy-core/commands.hpp"
+#include "avr-boy-core/graphx.hpp"
 #include "avr-boy-core/protocol.hpp"
 
 class handheld_c {
@@ -17,10 +18,13 @@ private:
 	before_transmit_cb m_cb_before_transmit = nullptr;
 	after_transmit_cb  m_cb_after_transmit  = nullptr;
 
+	graphx_c m_graphx;
+
 private:
 	void transmit(uint8_t cmd, uint8_t length, const uint8_t *data);
 	void waitfor_receive();
 	void handle_ping();
+	void handle_draw_pixel(const payload_draw_pixel_s *pixel);
 
 public:
 	handheld_c(protocol_c::transmit_cb cb_transmit,

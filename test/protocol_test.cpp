@@ -31,10 +31,7 @@ public:
 
 	static uint8_t receive()
 	{
-		uint8_t retval = m_receive_buffer[m_receive_index];
-		m_receive_index++;
-
-		return retval;
+		return m_receive_buffer[m_receive_index++];
 	}
 };
 

@@ -30,11 +30,11 @@ result_e cartridge_c::ping()
 	return m_received.cmd == CMD_PONG ? RESULT_OK : RESULT_WRONG_COMMAND;
 }
 
-result_e cartridge_c::draw_pixel(uint8_t x, uint8_t y, color_dao_e color)
+result_e cartridge_c::set_pixel(uint8_t x, uint8_t y, color_dao_e color)
 {
-	payload_draw_pixel_s pixel = {x, y, color};
+	payload_pixel_s pixel = {x, y, color};
 
-	transmit(CMD_DRAW_PIXEL, sizeof(payload_draw_pixel_s),
+	transmit(CMD_SET_PIXEL, sizeof(payload_pixel_s),
 	         reinterpret_cast<uint8_t *>(&pixel));
 
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;

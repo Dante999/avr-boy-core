@@ -13,18 +13,14 @@ enum commands_e {
 	CMD_PING,
 	CMD_PONG,
 	CMD_CHECK_VERSION,
-	CMD_GET_BUTTONS,
-	CMD_DISPLAY_BUFFER,
-	CMD_DISPLAY_SPRITES,
-	CMD_DRAW_TEXT,
-	CMD_DRAW_PIXEL,
-	CMD_CLEAR_SCREEN,
-	CMD_SPRITE,
+	CMD_SET_PIXEL,
+	CMD_DRAW_BUFFER,
+	CMD_CLEAR_BUFFER
 };
 
 enum color_dao_e : uint8_t { COLOR_WHITE, COLOR_BLACK };
 
-struct payload_draw_pixel_s {
+struct payload_pixel_s {
 	uint8_t x;
 	uint8_t y;
 	uint8_t color;

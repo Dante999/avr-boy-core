@@ -31,9 +31,9 @@ void handheld_c::waitfor_instructions()
 	case CMD_PING:
 		handle_ping();
 		break;
-	case CMD_DRAW_PIXEL:
-		handle_draw_pixel(
-		    reinterpret_cast<payload_draw_pixel_s *>(m_received.data));
+	case CMD_SET_PIXEL:
+		handle_set_pixel(
+		    reinterpret_cast<payload_pixel_s *>(m_received.data));
 		break;
 	}
 }
@@ -43,7 +43,7 @@ void handheld_c::handle_ping()
 	transmit(CMD_PONG, 0, nullptr);
 }
 
-void handheld_c::handle_draw_pixel(const payload_draw_pixel_s *pixel)
+void handheld_c::handle_set_pixel(const payload_pixel_s *pixel)
 {
 	m_graphx.draw_pixel(pixel->x, pixel->y,
 	                    (pixel->color == color_dao_e::COLOR_BLACK)

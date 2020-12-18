@@ -10,6 +10,7 @@ class handheld_c {
 public:
 	typedef void (*before_transmit_cb)(void);
 	typedef void (*after_transmit_cb)(void);
+	typedef void (*draw_buffer_cb)(graphx_c &gfx);
 
 private:
 	protocol_c            m_protocol;
@@ -17,13 +18,13 @@ private:
 
 	before_transmit_cb m_cb_before_transmit = nullptr;
 	after_transmit_cb  m_cb_after_transmit  = nullptr;
+	draw_buffer_cb     m_cb_draw_buffer     = nullptr;
 
 	graphx_c m_graphx;
 
 private:
 	void transmit(uint8_t cmd, uint8_t length, const uint8_t *data);
 	void waitfor_receive();
-	void handle_ping();
 	void handle_set_pixel(const payload_pixel_s *pixel);
 
 public:
@@ -32,6 +33,7 @@ public:
 
 	void set_before_transmit_callback(before_transmit_cb cb);
 	void set_after_transmit_callback(after_transmit_cb cb);
+	void set_draw_buffer_callback(draw_buffer_cb cb);
 	void waitfor_instructions();
 };
 
@@ -43,6 +45,11 @@ inline void handheld_c::set_before_transmit_callback(before_transmit_cb cb)
 inline void handheld_c::set_after_transmit_callback(after_transmit_cb cb)
 {
 	m_cb_after_transmit = cb;
+}
+
+inline void handheld_c::set_draw_buffer_callback(draw_buffer_cb cb)
+{
+	m_cb_draw_buffer = cb;
 }
 
 #endif /* HANDHELD_H */

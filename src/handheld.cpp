@@ -29,18 +29,21 @@ void handheld_c::waitfor_instructions()
 
 	switch (m_received.cmd) {
 	case CMD_PING:
-		handle_ping();
+		transmit(CMD_PONG, 0, nullptr);
 		break;
 	case CMD_SET_PIXEL:
 		handle_set_pixel(
 		    reinterpret_cast<payload_pixel_s *>(m_received.data));
 		break;
+	case CMD_DRAW_BUFFER:
+		if (m_cb_draw_buffer != nullptr) {
+			m_cb_draw_buffer(m_graphx);
+		}
+		break;
+	case CMD_CLEAR_BUFFER:
+		m_graphx.fill(graphx_c::PIXEL_OFF);
+		break;
 	}
-}
-
-void handheld_c::handle_ping()
-{
-	transmit(CMD_PONG, 0, nullptr);
 }
 
 void handheld_c::handle_set_pixel(const payload_pixel_s *pixel)

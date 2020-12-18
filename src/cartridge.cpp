@@ -39,3 +39,15 @@ result_e cartridge_c::set_pixel(uint8_t x, uint8_t y, color_dao_e color)
 
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }
+
+result_e cartridge_c::draw_buffer()
+{
+	transmit(CMD_DRAW_BUFFER, 0, nullptr);
+	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
+}
+
+result_e cartridge_c::clear_buffer()
+{
+	transmit(CMD_CLEAR_BUFFER, 0, nullptr);
+	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
+}

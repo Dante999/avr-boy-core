@@ -30,6 +30,8 @@ public:
 
 	result_e ping();
 	result_e set_pixel(uint8_t x, uint8_t y, color_dao_e color);
+	result_e draw_buffer();
+	result_e clear_buffer();
 };
 
 inline void cartridge_c::set_before_transmit_callback(before_transmit_cb cb)

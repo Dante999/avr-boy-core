@@ -25,7 +25,8 @@ private:
 private:
 	void transmit(uint8_t cmd, uint8_t length, const uint8_t *data);
 	void waitfor_receive();
-	void handle_set_pixel(const payload_pixel_s *pixel);
+	void handle_set_pixel(const avrboy_payload::pixel_s *pixel);
+	void handle_set_text(avrboy_payload::text_s *text);
 
 public:
 	handheld_c(protocol_c::transmit_cb cb_transmit,

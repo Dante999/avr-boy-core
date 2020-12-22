@@ -1,4 +1,5 @@
 #include "avr-boy-core/cartridge.hpp"
+#include <string.h>
 
 cartridge_c::cartridge_c(protocol_c::transmit_cb cb_transmit,
                          protocol_c::receive_cb  cb_receive)
@@ -34,12 +35,25 @@ void cartridge_c::sync_with_handheld()
 	m_protocol.sync();
 }
 
-result_e cartridge_c::set_pixel(uint8_t x, uint8_t y, color_dao_e color)
+result_e cartridge_c::set_pixel(uint8_t x, uint8_t y,
+                                avrboy_payload::color_e color)
 {
-	payload_pixel_s pixel = {x, y, color};
+	avrboy_payload::pixel_s pixel = {x, y, color};
 
-	transmit_and_wait_for_answer(CMD_SET_PIXEL, sizeof(payload_pixel_s),
+	transmit_and_wait_for_answer(CMD_SET_PIXEL, sizeof(pixel),
 	                             reinterpret_cast<uint8_t *>(&pixel));
+
+	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
+}
+
+result_e cartridge_c::set_text(uint8_t x, uint8_t y, const char *text)
+{
+	avrboy_payload::text_s data = {x, y, ""};
+
+	strncpy(data.text, text, avrboy_payload::MAX_TEXT_LENGTH);
+
+	transmit_and_wait_for_answer(CMD_SET_TEXT, sizeof(data),
+	                             reinterpret_cast<uint8_t *>(&data));
 
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }

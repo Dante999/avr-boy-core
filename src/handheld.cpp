@@ -1,4 +1,5 @@
 #include "avr-boy-core/handheld.hpp"
+#include "avr-boy-core/font5x7.hpp"
 
 handheld_c::handheld_c(protocol_c::transmit_cb cb_transmit,
                        protocol_c::receive_cb  cb_receive)
@@ -32,8 +33,12 @@ void handheld_c::waitfor_instructions()
 		transmit(CMD_PONG, 0, nullptr);
 		break;
 	case CMD_SET_PIXEL:
-		handle_set_pixel(
-		    reinterpret_cast<payload_pixel_s *>(m_received.data));
+		handle_set_pixel(reinterpret_cast<avrboy_payload::pixel_s *>(
+		    m_received.data));
+		break;
+	case CMD_SET_TEXT:
+		handle_set_text(reinterpret_cast<avrboy_payload::text_s *>(
+		    m_received.data));
 		break;
 	case CMD_DRAW_BUFFER:
 		if (m_cb_draw_buffer != nullptr) {
@@ -51,12 +56,19 @@ void handheld_c::waitfor_instructions()
 	}
 }
 
-void handheld_c::handle_set_pixel(const payload_pixel_s *pixel)
+void handheld_c::handle_set_pixel(const avrboy_payload::pixel_s *pixel)
 {
-	m_graphx.draw_pixel(pixel->x, pixel->y,
-	                    (pixel->color == color_dao_e::COLOR_BLACK)
-	                        ? graphx_c::PIXEL_ON
-	                        : graphx_c::PIXEL_OFF);
+	m_graphx.draw_pixel(
+	    pixel->x, pixel->y,
+	    (pixel->color == avrboy_payload::color_e::COLOR_BLACK)
+	        ? graphx_c::PIXEL_ON
+	        : graphx_c::PIXEL_OFF);
 
 	transmit(CMD_ACK, 0, nullptr);
+}
+
+void handheld_c::handle_set_text(avrboy_payload::text_s *text)
+{
+	text->text[avrboy_payload::MAX_TEXT_LENGTH - 1] = '\0'; // safety first
+	m_graphx.draw_string(font5x7, text->x, text->y, text->text);
 }

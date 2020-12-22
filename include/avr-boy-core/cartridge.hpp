@@ -37,7 +37,8 @@ public:
 
 	result_e ping();
 	void     sync_with_handheld();
-	result_e set_pixel(uint8_t x, uint8_t y, color_dao_e color);
+	result_e set_pixel(uint8_t x, uint8_t y, avrboy_payload::color_e color);
+	result_e set_text(uint8_t x, uint8_t y, const char *text);
 	result_e draw_buffer();
 	result_e clear_buffer();
 };

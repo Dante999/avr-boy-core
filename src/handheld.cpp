@@ -30,45 +30,80 @@ void handheld_c::waitfor_instructions()
 
 	switch (m_received.cmd) {
 	case CMD_PING:
-		transmit(CMD_PONG, 0, nullptr);
+		cmd_ping();
 		break;
 	case CMD_SET_PIXEL:
-		handle_set_pixel(reinterpret_cast<avrboy_payload::pixel_s *>(
-		    m_received.data));
+		cmd_set_pixel(m_received.data);
 		break;
 	case CMD_SET_TEXT:
-		handle_set_text(reinterpret_cast<avrboy_payload::text_s *>(
-		    m_received.data));
+		cmd_set_text(m_received.data);
+		break;
+	case CMD_SET_TILE_8X8:
+		cmd_set_tile_8x8(m_received.data);
 		break;
 	case CMD_DRAW_BUFFER:
-		if (m_cb_draw_buffer != nullptr) {
-			m_cb_draw_buffer(m_graphx);
-			transmit(CMD_ACK, 0, nullptr);
-		}
-		else {
-			transmit(CMD_NOT_SUPPORTED, 0, nullptr);
-		}
+		cmd_draw_buffer();
 		break;
 	case CMD_CLEAR_BUFFER:
-		m_graphx.fill(graphx_c::PIXEL_OFF);
-		transmit(CMD_ACK, 0, nullptr);
+		cmd_clear_buffer();
+		break;
+	default:
+		response_with(CMD_NOT_SUPPORTED);
 		break;
 	}
 }
 
-void handheld_c::handle_set_pixel(const avrboy_payload::pixel_s *pixel)
+void handheld_c::cmd_ping()
 {
+	transmit(CMD_PONG, 0, nullptr);
+}
+
+void handheld_c::cmd_set_pixel(uint8_t *data)
+{
+	auto pixel = reinterpret_cast<avrboy_payload::pixel_s *>(data);
+
 	m_graphx.draw_pixel(
 	    pixel->x, pixel->y,
 	    (pixel->color == avrboy_payload::color_e::COLOR_BLACK)
 	        ? graphx_c::PIXEL_ON
 	        : graphx_c::PIXEL_OFF);
 
-	transmit(CMD_ACK, 0, nullptr);
+	response_with(CMD_ACK);
 }
 
-void handheld_c::handle_set_text(avrboy_payload::text_s *text)
+void handheld_c::cmd_set_text(uint8_t *data)
 {
+	auto text = reinterpret_cast<avrboy_payload::text_s *>(data);
+
 	text->text[avrboy_payload::MAX_TEXT_LENGTH - 1] = '\0'; // safety first
 	m_graphx.draw_string(font5x7, text->x, text->y, text->text);
+
+	response_with(CMD_ACK);
+}
+
+void handheld_c::cmd_set_tile_8x8(uint8_t *data)
+{
+	auto tile = reinterpret_cast<avrboy_payload::tile_8x8_s *>(data);
+
+	m_graphx.draw_tile(tile->x, tile->y, tile->tile, 8, 8);
+
+	response_with(CMD_ACK);
+}
+
+void handheld_c::cmd_draw_buffer()
+{
+	if (m_cb_draw_buffer != nullptr) {
+		m_cb_draw_buffer(m_graphx);
+		response_with(CMD_ACK);
+	}
+	else {
+		response_with(CMD_NOT_SUPPORTED);
+	}
+}
+
+void handheld_c::cmd_clear_buffer()
+{
+	m_graphx.fill(graphx_c::PIXEL_OFF);
+
+	response_with(CMD_ACK);
 }

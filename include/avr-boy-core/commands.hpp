@@ -10,6 +10,7 @@ enum commands_e {
 	CMD_SYNC = 1,
 	CMD_ACK,
 	CMD_NACK,
+        CMD_NOT_SUPPORTED,
 	CMD_PING,
 	CMD_PONG,
 	CMD_CHECK_VERSION,

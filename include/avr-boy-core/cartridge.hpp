@@ -21,6 +21,13 @@ private:
 	void transmit(uint8_t cmd, uint8_t length, const uint8_t *data);
 	void waitfor_receive();
 
+	inline void transmit_and_wait_for_answer(uint8_t cmd, uint8_t length,
+	                                         const uint8_t *data)
+	{
+		transmit(cmd, length, data);
+		waitfor_receive();
+	}
+
 public:
 	cartridge_c(protocol_c::transmit_cb cb_transmit,
 	            protocol_c::receive_cb  cb_receive);
@@ -29,6 +36,7 @@ public:
 	void set_after_transmit_callback(after_transmit_cb cb);
 
 	result_e ping();
+	void     sync_with_handheld();
 	result_e set_pixel(uint8_t x, uint8_t y, color_dao_e color);
 	result_e draw_buffer();
 	result_e clear_buffer();

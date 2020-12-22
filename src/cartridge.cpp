@@ -24,30 +24,36 @@ void cartridge_c::waitfor_receive()
 
 result_e cartridge_c::ping()
 {
-	transmit(CMD_PING, 0, nullptr);
-	waitfor_receive();
+	transmit_and_wait_for_answer(CMD_PING, 0, nullptr);
 
 	return m_received.cmd == CMD_PONG ? RESULT_OK : RESULT_WRONG_COMMAND;
+}
+
+void cartridge_c::sync_with_handheld()
+{
+	m_protocol.sync();
 }
 
 result_e cartridge_c::set_pixel(uint8_t x, uint8_t y, color_dao_e color)
 {
 	payload_pixel_s pixel = {x, y, color};
 
-	transmit(CMD_SET_PIXEL, sizeof(payload_pixel_s),
-	         reinterpret_cast<uint8_t *>(&pixel));
+	transmit_and_wait_for_answer(CMD_SET_PIXEL, sizeof(payload_pixel_s),
+	                             reinterpret_cast<uint8_t *>(&pixel));
 
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }
 
 result_e cartridge_c::draw_buffer()
 {
-	transmit(CMD_DRAW_BUFFER, 0, nullptr);
+	transmit_and_wait_for_answer(CMD_DRAW_BUFFER, 0, nullptr);
+
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }
 
 result_e cartridge_c::clear_buffer()
 {
-	transmit(CMD_CLEAR_BUFFER, 0, nullptr);
+	transmit_and_wait_for_answer(CMD_CLEAR_BUFFER, 0, nullptr);
+
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }

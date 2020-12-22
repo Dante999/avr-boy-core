@@ -38,10 +38,15 @@ void handheld_c::waitfor_instructions()
 	case CMD_DRAW_BUFFER:
 		if (m_cb_draw_buffer != nullptr) {
 			m_cb_draw_buffer(m_graphx);
+			transmit(CMD_ACK, 0, nullptr);
+		}
+		else {
+			transmit(CMD_NOT_SUPPORTED, 0, nullptr);
 		}
 		break;
 	case CMD_CLEAR_BUFFER:
 		m_graphx.fill(graphx_c::PIXEL_OFF);
+		transmit(CMD_ACK, 0, nullptr);
 		break;
 	}
 }

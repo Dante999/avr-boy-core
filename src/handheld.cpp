@@ -119,3 +119,17 @@ void handheld_c::cmd_clear_buffer()
 
 	response_with(CMD_ACK);
 }
+
+void handheld_c::cmd_get_buttons()
+{
+	if (m_cb_get_buttons != nullptr) {
+		avrboy_payload::buttons_s buttons;
+		m_cb_get_buttons(buttons);
+
+		transmit(CMD_ACK, sizeof(buttons),
+		         reinterpret_cast<uint8_t *>(&buttons));
+	}
+	else {
+		response_with(CMD_NOT_SUPPORTED);
+	}
+}

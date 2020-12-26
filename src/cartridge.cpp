@@ -50,7 +50,7 @@ result_e cartridge_c::set_text(uint8_t x, uint8_t y, const char *text)
 {
 	avrboy_payload::text_s data = {x, y, ""};
 
-	strncpy(data.text, text, avrboy_payload::MAX_TEXT_LENGTH-1);
+	strncpy(data.text, text, avrboy_payload::MAX_TEXT_LENGTH - 1);
 
 	transmit_and_wait_for_answer(CMD_SET_TEXT, sizeof(data),
 	                             reinterpret_cast<uint8_t *>(&data));
@@ -79,6 +79,15 @@ result_e cartridge_c::set_tile_8x8(uint8_t x, uint8_t y, const uint8_t tile[])
 
 	transmit_and_wait_for_answer(CMD_SET_TILE_8X8, sizeof(data),
 	                             reinterpret_cast<uint8_t *>(&data));
+
+	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
+}
+
+result_e cartridge_c::get_buttons(avrboy_payload::buttons_s &buttons)
+{
+	transmit_and_wait_for_answer(CMD_GET_BUTTONS, 0, nullptr);
+
+	memcpy(&buttons, m_received.data, sizeof(buttons));
 
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }

@@ -41,6 +41,7 @@ public:
 	result_e set_text(uint8_t x, uint8_t y, const char *text);
 	result_e set_char(uint8_t x, uint8_t y, char c);
 	result_e set_tile_8x8(uint8_t x, uint8_t y, const uint8_t tile[8]);
+	result_e get_buttons(avrboy_payload::buttons_s &buttons);
 	result_e draw_buffer();
 	result_e clear_buffer();
 };

@@ -11,6 +11,7 @@ public:
 	typedef void (*before_transmit_cb)(void);
 	typedef void (*after_transmit_cb)(void);
 	typedef void (*draw_buffer_cb)(graphx_c &gfx);
+	typedef void (*get_buttons_cb)(avrboy_payload::buttons_s &buttons);
 
 private:
 	protocol_c            m_protocol;
@@ -19,6 +20,7 @@ private:
 	before_transmit_cb m_cb_before_transmit = nullptr;
 	after_transmit_cb  m_cb_after_transmit  = nullptr;
 	draw_buffer_cb     m_cb_draw_buffer     = nullptr;
+	get_buttons_cb     m_cb_get_buttons     = nullptr;
 
 	graphx_c m_graphx;
 
@@ -32,6 +34,7 @@ private:
 	void cmd_set_tile_8x8(uint8_t *data);
 	void cmd_draw_buffer();
 	void cmd_clear_buffer();
+	void cmd_get_buttons();
 
 	inline void response_with(uint8_t cmd)
 	{
@@ -45,6 +48,7 @@ public:
 	void set_before_transmit_callback(before_transmit_cb cb);
 	void set_after_transmit_callback(after_transmit_cb cb);
 	void set_draw_buffer_callback(draw_buffer_cb cb);
+	void set_get_buttons_callback(get_buttons_cb cb);
 	void waitfor_instructions();
 };
 
@@ -61,6 +65,11 @@ inline void handheld_c::set_after_transmit_callback(after_transmit_cb cb)
 inline void handheld_c::set_draw_buffer_callback(draw_buffer_cb cb)
 {
 	m_cb_draw_buffer = cb;
+}
+
+inline void handheld_c::set_get_buttons_callback(get_buttons_cb cb)
+{
+	m_cb_get_buttons = cb;
 }
 
 #endif /* HANDHELD_H */

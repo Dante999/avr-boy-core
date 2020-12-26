@@ -50,7 +50,7 @@ result_e cartridge_c::set_text(uint8_t x, uint8_t y, const char *text)
 {
 	avrboy_payload::text_s data = {x, y, ""};
 
-	strncpy(data.text, text, avrboy_payload::MAX_TEXT_LENGTH);
+	strncpy(data.text, text, avrboy_payload::MAX_TEXT_LENGTH-1);
 
 	transmit_and_wait_for_answer(CMD_SET_TEXT, sizeof(data),
 	                             reinterpret_cast<uint8_t *>(&data));

@@ -50,6 +50,9 @@ void handheld_c::waitfor_instructions()
 	case CMD_CLEAR_BUFFER:
 		cmd_clear_buffer();
 		break;
+	case CMD_GET_BUTTONS:
+		cmd_get_buttons();
+		break;
 	default:
 		response_with(CMD_NOT_SUPPORTED);
 		break;

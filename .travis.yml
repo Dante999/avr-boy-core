@@ -25,3 +25,17 @@ jobs:
             - cmake ..
             - make 
             - bin/unit-tests
+    include:
+        - os: linux
+          dist: focal
+          compiler: avr-gcc
+
+          addons:
+              apt:
+                  packages:
+                      - avr-gcc
+          script:
+            - mkdir build
+            - cd build
+            - cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-avr-gcc.cmake
+            - make 

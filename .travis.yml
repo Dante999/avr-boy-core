@@ -33,7 +33,7 @@ jobs:
           addons:
               apt:
                   packages:
-                      - avr-gcc
+                      - gcc-avr
           script:
             - mkdir build
             - cd build

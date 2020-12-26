@@ -38,6 +38,9 @@ void handheld_c::waitfor_instructions()
 	case CMD_SET_TEXT:
 		cmd_set_text(m_received.data);
 		break;
+	case CMD_SET_CHAR:
+		cmd_set_char(m_received.data);
+		break;
 	case CMD_SET_TILE_8X8:
 		cmd_set_tile_8x8(m_received.data);
 		break;
@@ -77,6 +80,15 @@ void handheld_c::cmd_set_text(uint8_t *data)
 
 	text->text[avrboy_payload::MAX_TEXT_LENGTH - 1] = '\0'; // safety first
 	m_graphx.draw_string(font5x7, text->x, text->y, text->text);
+
+	response_with(CMD_ACK);
+}
+
+void handheld_c::cmd_set_char(uint8_t *data)
+{
+	auto character = reinterpret_cast<avrboy_payload::char_s *>(data);
+	m_graphx.draw_char(font5x7, character->x, character->y,
+	                   character->letter);
 
 	response_with(CMD_ACK);
 }

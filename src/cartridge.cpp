@@ -58,6 +58,16 @@ result_e cartridge_c::set_text(uint8_t x, uint8_t y, const char *text)
 	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
 }
 
+result_e cartridge_c::set_char(uint8_t x, uint8_t y, char c)
+{
+	avrboy_payload::char_s data = {x, y, c};
+
+	transmit_and_wait_for_answer(CMD_SET_CHAR, sizeof(data),
+	                             reinterpret_cast<uint8_t *>(&data));
+
+	return m_received.cmd == CMD_ACK ? RESULT_OK : RESULT_NOK;
+}
+
 result_e cartridge_c::set_tile_8x8(uint8_t x, uint8_t y, const uint8_t tile[])
 {
 	avrboy_payload::tile_8x8_s data;

@@ -28,6 +28,7 @@ private:
 	void cmd_ping();
 	void cmd_set_pixel(uint8_t *data);
 	void cmd_set_text(uint8_t *data);
+	void cmd_set_char(uint8_t *data);
 	void cmd_set_tile_8x8(uint8_t *data);
 	void cmd_draw_buffer();
 	void cmd_clear_buffer();

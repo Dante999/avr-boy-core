@@ -39,6 +39,7 @@ public:
 	void     sync_with_handheld();
 	result_e set_pixel(uint8_t x, uint8_t y, avrboy_payload::color_e color);
 	result_e set_text(uint8_t x, uint8_t y, const char *text);
+	result_e set_char(uint8_t x, uint8_t y, char c);
 	result_e set_tile_8x8(uint8_t x, uint8_t y, const uint8_t tile[8]);
 	result_e draw_buffer();
 	result_e clear_buffer();

@@ -16,6 +16,7 @@ enum commands_e {
 	CMD_CHECK_VERSION,
 	CMD_SET_PIXEL,
 	CMD_SET_TEXT,
+	CMD_SET_CHAR,
 	CMD_SET_TILE_8X8,
 	CMD_DRAW_BUFFER,
 	CMD_CLEAR_BUFFER
@@ -37,6 +38,12 @@ struct pixel_s {
 	uint8_t x;
 	uint8_t y;
 	color_e color;
+};
+
+struct char_s {
+	uint8_t x;
+	uint8_t y;
+	char    letter;
 };
 
 struct tile_8x8_s {

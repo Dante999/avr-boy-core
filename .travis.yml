@@ -1,0 +1,31 @@
+language: cpp
+compiler: gcc
+
+
+install:
+  - pip3 install conan
+
+  # Fail if we can't run Conan.
+  - conan --version
+
+
+
+jobs:
+    include:
+        - os: linux
+          dist: focal
+          compiler: gcc
+
+          addons:
+              apt:
+                  packages:
+                      - python3
+                      - python3-pip
+        
+
+script:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make 
+    - bin/unit-tests

@@ -1,0 +1,8 @@
+set(USE_AVR_GCC TRUE)
+
+set(AVR_MMCU "attiny85")
+
+set(CMAKE_C_COMPILER avr-gcc)
+set(CMAKE_CXX_COMPILER avr-gcc)
+# set(CMAKE_CXX_FLAGS ${AVR_GCC_WARNINGS})
+set(CMAKE_CXX_FLAGS "-mmcu=${AVR_MMCU}")

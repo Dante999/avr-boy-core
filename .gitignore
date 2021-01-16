@@ -12,6 +12,7 @@
 # QT Creator (used for QT projects)
 # keep the independent .pro file but delete user files
 *.pro.user
+CMakeLists.txt.user
 
 # C Object files
 *.obj

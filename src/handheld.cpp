@@ -1,27 +1,21 @@
 #include "avr-boy-core/handheld.hpp"
 #include "avr-boy-core/font5x7.hpp"
 
-handheld_c::handheld_c(protocol_c::transmit_cb cb_transmit,
-                       protocol_c::receive_cb  cb_receive)
-    : m_protocol(cb_transmit, cb_receive)
+handheld_c::handheld_c()
 {
 	m_graphx.fill(0x00);
 }
 
 void handheld_c::transmit(uint8_t cmd, uint8_t length, const uint8_t *data)
 {
-	if (m_cb_before_transmit != nullptr)
-		m_cb_before_transmit();
-
-	m_protocol.send_package(cmd, length, data);
-
-	if (m_cb_after_transmit != nullptr)
-		m_cb_after_transmit();
+	publish_ready_for_communication();
+	send_package(cmd, length, data);
+	publish_status_busy();
 }
 
 void handheld_c::waitfor_receive()
 {
-	m_protocol.waitfor_package(m_received);
+	waitfor_package(m_received);
 }
 
 void handheld_c::waitfor_instructions()
@@ -107,32 +101,21 @@ void handheld_c::cmd_set_tile_8x8(uint8_t *data)
 
 void handheld_c::cmd_draw_buffer()
 {
-	if (m_cb_draw_buffer != nullptr) {
-		m_cb_draw_buffer(m_graphx);
-		response_with(CMD_ACK);
-	}
-	else {
-		response_with(CMD_NOT_SUPPORTED);
-	}
+	draw_buffer(m_graphx);
+	response_with(CMD_ACK);
 }
 
 void handheld_c::cmd_clear_buffer()
 {
 	m_graphx.fill(graphx_c::PIXEL_OFF);
-
 	response_with(CMD_ACK);
 }
 
 void handheld_c::cmd_get_buttons()
 {
-	if (m_cb_get_buttons != nullptr) {
-		avrboy_payload::buttons_s buttons;
-		m_cb_get_buttons(buttons);
+	avrboy_payload::buttons_s buttons;
 
-		transmit(CMD_ACK, sizeof(buttons),
-		         reinterpret_cast<uint8_t *>(&buttons));
-	}
-	else {
-		response_with(CMD_NOT_SUPPORTED);
-	}
+	get_buttons(buttons);
+	transmit(CMD_ACK, sizeof(buttons),
+	         reinterpret_cast<uint8_t *>(&buttons));
 }

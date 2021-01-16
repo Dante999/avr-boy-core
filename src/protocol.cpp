@@ -20,13 +20,6 @@
 
 #include <stdio.h>
 
-protocol_c::protocol_c(transmit_cb cb_transmit,
-                       receive_cb  cb_receive)
-    : m_cb_transmit(cb_transmit), //
-      m_cb_receive(cb_receive)
-{
-}
-
 bool protocol_c::parse_received_byte(uint8_t byte)
 {
 	static uint8_t i = 0;
@@ -92,7 +85,7 @@ void protocol_c::waitfor_package(package_s &result)
 {
 
 	while (!m_receive_complete) {
-		const uint8_t c = m_cb_receive();
+		const uint8_t c = receive_byte();
 		parse_received_byte(c);
 	}
 
@@ -103,7 +96,7 @@ void protocol_c::waitfor_package(package_s &result)
 void protocol_c::sync(void)
 {
 	for (uint8_t i = 0; i <= MAX_DATA_LEN; i++) {
-		m_cb_transmit(START_BYTE);
+		send_byte(START_BYTE);
 	}
 
 	reset();
@@ -127,11 +120,11 @@ void protocol_c::copy_received_to(package_s &result)
 
 void protocol_c::send_package(uint8_t cmd, uint8_t length, const uint8_t *data)
 {
-	m_cb_transmit(START_BYTE);
-	m_cb_transmit(cmd);
-	m_cb_transmit(length);
+	send_byte(START_BYTE);
+	send_byte(cmd);
+	send_byte(length);
 
 	for (uint8_t i = 0; i < length; ++i) {
-		m_cb_transmit(data[i]);
+		send_byte(data[i]);
 	}
 }

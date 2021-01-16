@@ -26,11 +26,12 @@
 class protocol_c {
 
 public:
+	virtual void    send_byte(uint8_t byte) = 0;
+	virtual uint8_t receive_byte()          = 0;
+
+public:
 	static constexpr uint8_t START_BYTE   = 0x00;
 	static constexpr uint8_t MAX_DATA_LEN = 50;
-
-	typedef void (*transmit_cb)(uint8_t byte);
-	typedef uint8_t (*receive_cb)(void);
 
 	struct package_s {
 		uint8_t cmd;
@@ -46,18 +47,16 @@ private:
 		WAITFOR_DATA
 	};
 
-	state_e     m_state{WAITFOR_SYNC};
-	transmit_cb m_cb_transmit;
-	receive_cb  m_cb_receive;
-	bool        m_receive_complete{false};
-	package_s   m_package;
+	state_e   m_state{WAITFOR_SYNC};
+	bool      m_receive_complete{false};
+	package_s m_package;
 
 private:
 	bool parse_received_byte(uint8_t byte);
 	void copy_received_to(package_s &result);
 
 public:
-	protocol_c(transmit_cb cb_transmit, receive_cb cb_receive);
+	virtual ~protocol_c() {}
 
 	void sync();
 	void reset();

@@ -1,26 +1,16 @@
 #include "avr-boy-core/cartridge.hpp"
 #include <string.h>
 
-cartridge_c::cartridge_c(protocol_c::transmit_cb cb_transmit,
-                         protocol_c::receive_cb  cb_receive)
-    : m_protocol(cb_transmit, cb_receive)
-{
-}
-
 void cartridge_c::transmit(uint8_t cmd, uint8_t length, const uint8_t *data)
 {
-	if (m_cb_before_transmit != nullptr)
-		m_cb_before_transmit();
-
-	m_protocol.send_package(cmd, length, data);
-
-	if (m_cb_after_transmit != nullptr)
-		m_cb_after_transmit();
+	transmitting_start();
+	send_package(cmd, length, data);
+	transmitting_end();
 }
 
 void cartridge_c::waitfor_receive()
 {
-	m_protocol.waitfor_package(m_received);
+	waitfor_package(m_received);
 }
 
 result_e cartridge_c::ping()
@@ -32,7 +22,7 @@ result_e cartridge_c::ping()
 
 void cartridge_c::sync_with_handheld()
 {
-	m_protocol.sync();
+	sync();
 }
 
 result_e cartridge_c::set_pixel(uint8_t x, uint8_t y,

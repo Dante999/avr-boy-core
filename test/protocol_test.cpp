@@ -2,34 +2,25 @@
 
 #include "avr-boy-core/protocol.hpp"
 
-static constexpr uint8_t DUMMY_CMD  = 0x10;
-static constexpr uint8_t START_BYTE = protocol_c::START_BYTE;
-static constexpr uint8_t BUFFER_LEN = 255;
+class protocol_test : public protocol_c, public ::testing::Test {
 
-static uint8_t m_receive_buffer[BUFFER_LEN];
-static uint8_t m_transmit_buffer[BUFFER_LEN];
+protected:
+	static constexpr uint8_t DUMMY_CMD  = 0x10;
+	static constexpr uint8_t BUFFER_LEN = 255;
 
-static uint8_t m_transmit_index;
-static uint8_t m_receive_index;
+	uint8_t m_receive_buffer[BUFFER_LEN]  = {0x00};
+	uint8_t m_transmit_buffer[BUFFER_LEN] = {0x00};
 
-class protocol_test : public ::testing::Test {
+	uint8_t m_transmit_index = 0;
+	uint8_t m_receive_index  = 0;
 
 public:
-	static void init()
-	{
-		m_transmit_index = 0;
-		m_receive_index  = 0;
-
-		memset(m_receive_buffer, 0x00, BUFFER_LEN);
-		memset(m_transmit_buffer, 0x00, BUFFER_LEN);
-	}
-
-	static void transmit(uint8_t byte)
+	void send_byte(uint8_t byte) override
 	{
 		m_transmit_buffer[m_transmit_index++] = byte;
 	}
 
-	static uint8_t receive()
+	uint8_t receive_byte() override
 	{
 		return m_receive_buffer[m_receive_index++];
 	}
@@ -37,12 +28,9 @@ public:
 
 TEST_F(protocol_test, test_transmit_callback)
 {
-	init();
-
 	const uint8_t data[2] = {3, 4};
-	protocol_c    prot(&this->transmit, &this->receive);
 
-	prot.send_package(1, 2, data);
+	send_package(1, 2, data);
 
 	for (uint8_t i = 0; i < 5; ++i) {
 		ASSERT_EQ(i, m_transmit_buffer[i])
@@ -52,9 +40,6 @@ TEST_F(protocol_test, test_transmit_callback)
 
 TEST_F(protocol_test, receive_callback)
 {
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
-
 	m_receive_buffer[0] = START_BYTE;
 	m_receive_buffer[1] = DUMMY_CMD;
 	m_receive_buffer[2] = 1;
@@ -65,7 +50,7 @@ TEST_F(protocol_test, receive_callback)
 	protocol_c::package_s received;
 	memset(&received, 0x00, sizeof(received));
 
-	m_protocol.waitfor_package(received);
+	waitfor_package(received);
 
 	ASSERT_EQ(4, m_receive_index);
 
@@ -76,12 +61,9 @@ TEST_F(protocol_test, receive_callback)
 
 TEST_F(protocol_test, transmit_callback)
 {
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
-
 	uint8_t data[4] = {1, 2, 3, 4};
 
-	m_protocol.send_package(data[0], data[1], &data[2]);
+	send_package(data[0], data[1], &data[2]);
 
 	ASSERT_EQ(5, m_transmit_index);
 
@@ -95,9 +77,6 @@ TEST_F(protocol_test, transmit_callback)
 
 TEST_F(protocol_test, receive_package_with_min_length)
 {
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
-
 	uint8_t sync   = START_BYTE;
 	uint8_t cmd    = DUMMY_CMD;
 	uint8_t length = 0;
@@ -110,7 +89,7 @@ TEST_F(protocol_test, receive_package_with_min_length)
 	protocol_c::package_s received;
 	memset(&received, 0x00, sizeof(received));
 
-	m_protocol.waitfor_package(received);
+	waitfor_package(received);
 
 	ASSERT_EQ(3, m_receive_index);
 }
@@ -119,9 +98,6 @@ TEST_F(protocol_test, receive_package_with_max_length)
 {
 	ASSERT_TRUE(protocol_c::MAX_DATA_LEN < 255)
 	    << "Protocol length already exceed 8bit limit! Cannot test";
-
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
 
 	uint8_t sync   = START_BYTE;
 	uint8_t cmd    = DUMMY_CMD;
@@ -135,16 +111,13 @@ TEST_F(protocol_test, receive_package_with_max_length)
 	protocol_c::package_s received;
 	memset(&received, 0x00, sizeof(received));
 
-	m_protocol.waitfor_package(received);
+	waitfor_package(received);
 
 	ASSERT_EQ(protocol_c::MAX_DATA_LEN, received.length);
 }
 
 TEST_F(protocol_test, reset_when_multible_start_bytes)
 {
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
-
 	m_receive_buffer[0] = 3;
 	m_receive_buffer[1] = 3;
 	m_receive_buffer[2] = 3;
@@ -160,7 +133,7 @@ TEST_F(protocol_test, reset_when_multible_start_bytes)
 	protocol_c::package_s received;
 	memset(&received, 0x00, sizeof(received));
 
-	m_protocol.waitfor_package(received);
+	waitfor_package(received);
 
 	ASSERT_EQ(DUMMY_CMD, received.cmd);
 	ASSERT_EQ(0, received.length);
@@ -168,12 +141,9 @@ TEST_F(protocol_test, reset_when_multible_start_bytes)
 
 TEST_F(protocol_test, sync)
 {
-	protocol_c m_protocol(&this->transmit, &this->receive);
-	init();
-
 	memset(m_transmit_buffer, 0xFF, BUFFER_LEN);
 
-	m_protocol.sync();
+	sync();
 
 	for (uint8_t i = 0; i <= protocol_c::MAX_DATA_LEN; i++) {
 		ASSERT_EQ(START_BYTE, m_transmit_buffer[i]);

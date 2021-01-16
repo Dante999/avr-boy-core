@@ -7,8 +7,8 @@
 class cartridge_c : public protocol_c {
 
 public:
-	virtual void transmitting_start();
-	virtual void transmitting_end();
+	virtual void transmitting_start() {}
+	virtual void transmitting_end() {}
 
 private:
 	protocol_c::package_s m_received;
